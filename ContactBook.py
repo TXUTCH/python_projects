@@ -1,4 +1,20 @@
-contacts = {}
+import json
+
+def save_contacts(filename="contacts.json"):
+    with open(filename, "w") as f:
+        json.dump(contacts, f)
+    print("Contacts saved!")
+
+def load_contacts(filename="contacts.json"):
+    global contacts
+    try:
+        with open(filename, "r") as f:
+            contacts = json.load(f)
+        print("Contacts loaded!")
+    except FileNotFoundError:
+        contacts = {}
+
+load_contacts()
 
 while True:
     print("=" * 20)
@@ -32,39 +48,49 @@ while True:
                     print(f"{i}. {contact}: {contacts[contact]}")
 
     elif choice == 3:
-        name = input("Enter the contact name: ")
+        name = input("Enter the contact name: ").lower()
+        found = False
         if not contacts:
             print("No contacts yet!")
         else:
-            if name in contacts:
-                for i, contact in enumerate(contacts, start=1):
-                    print(f"{contact}: {contacts[contact]}")
-            else:
+            for contact_name, number in contacts.items():
+                if contact_name.lower() == name.lower():
+                    print(f"{contact_name}: {number}")
+                    found = True
+            if not found:
                 print("Contact not found!")
 
 
     elif choice == 4:
-        name = input("Enter the contact name: ")
+        name = input("Enter the contact name: ").lower()
+        found = False
         if not contacts:
             print("No contacts yet!")
         else:
-            if name in contacts:
-                contact = str(input("Enter the new phone number: "))
-                updateContact = {name: contact}
-                contacts.update(updateContact)
-                for i, contact in enumerate(contacts, start=1):
-                    print(f"{contact}: {contacts[contact]}")
-            else:
+            for contact_name, number in contacts.items():
+                if contact_name.lower() == name.lower():
+                    found = True
+                    contact = str(input("Enter the new phone number: "))
+                    updateContact = {contact_name: contact}
+                    contacts.update(updateContact)
+                    print(f"{contact_name}: {contact}")
+            if not found:
                 print("Contact not found!")
     elif choice == 5:
-        name = input("Enter the contact name to delete: ")
-        if name in contacts:
-            del contacts[name]
-            print(f"Deleted contact: {name}")
+        name = input("Enter the contact name to delete: ").lower()
+        found_key = None
+        for contact_name, number in contacts.items():
+            if contact_name.lower() == name.lower():
+                found_key = contact_name
+                break
+        if found_key:
+            del contacts[found_key]
+            print(f"Deleted contact: {found_key}")
         else:
             print("Contact not found!")
 
     elif choice == 6:
+        save_contacts()
         break
 
     else:
